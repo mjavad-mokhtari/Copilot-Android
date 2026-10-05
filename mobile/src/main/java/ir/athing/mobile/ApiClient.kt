@@ -101,30 +101,6 @@ data class ChatLine(
 ) {
     val fromUser: Boolean get() = role == "user"
 }
-data class ChatConversation(
-    val sessionId: String,
-    val title: String,
-    val titleCustom: Boolean,
-    val space: String,
-    val project: String,
-    val scope: String,
-    val provider: String,
-    val createdAt: Long,
-    val updatedAt: Long,
-)
-data class ChatLine(
-    val messageId: String,
-    val role: String,
-    val text: String,
-    val createdAt: Long,
-    val error: Boolean = false,
-    val query: String = "",
-    val answer: String = "",
-    val sourcesJson: String = "[]",
-    val taskItemsJson: String = "[]",
-) {
-    val fromUser: Boolean get() = role == "user"
-}
 
 class EtingApi(context: Context) {
     private val vault = SessionVault(context.applicationContext)
