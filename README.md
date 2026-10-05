@@ -4,7 +4,7 @@ This repository contains the Android phone app and Wear OS reminder companion. T
 
 ## Build on the Eting server
 
-The production build host has the Android SDK, Gradle dependency cache, and Google Maven redirector configured. From `/root/eting-android`, run:
+The production build host has the Android SDK, Gradle dependency cache, and Google Maven redirector configured. From the repository root on that host, run:
 
 ```sh
 ./gradlew :mobile:assembleDebug :wear:assembleDebug
