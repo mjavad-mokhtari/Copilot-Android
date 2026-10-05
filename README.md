@@ -1,21 +1,15 @@
 # Eting Android
 
-The repository includes a standalone Android app module for Eting chat, account sessions, reminders, and Firebase push notifications.
+This repository contains the Android phone app and Wear OS reminder companion. The app shares authenticated chat history and reminders with the Eting web client.
 
-## Build
+## Build on the Eting server
 
-Install JDK 17 or newer and Android SDK Platform 36 / Build Tools 36.0.0, accept the Android SDK licenses, then run:
+The production build host has the Android SDK, Gradle dependency cache, and Google Maven redirector configured. From `/root/eting-android`, run:
 
 ```sh
-./gradlew testDebugUnitTest assembleDebug
+./gradlew :mobile:assembleDebug :wear:assembleDebug
 ```
 
-The debug APK is written to `mobile/build/outputs/apk/debug/mobile-debug.apk`.
+The APKs are written to `mobile/build/outputs/apk/debug/mobile-debug.apk` and `wear/build/outputs/apk/debug/wear-debug.apk`. The phone APK is served from the Eting login page at `/downloads/android`.
 
-## Firebase push notifications
-
-Chat, account, and reminder APIs build without Firebase project credentials. To enable push-token registration and notification delivery, provide the app-specific `mobile/google-services.json` through a private configuration channel. Do not commit Firebase credentials or signing keys. The Google Services Gradle plugin is applied only when that file exists.
-
-## Shared account data
-
-The app uses the authenticated account session for chat history and reminders. Chat history is loaded from the server on app/tab entry and refreshed in the background. Reminder lists are refreshed on entry and retried in the background when the API is unavailable.
+Firebase project configuration and server push credentials are private and must not be committed. The Google Services plugin is applied when `mobile/google-services.json` is present on the build host.

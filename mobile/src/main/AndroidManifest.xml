@@ -6,8 +6,9 @@
         android:allowBackup="false"
         android:label="ائتینگ"
         android:supportsRtl="true"
-        android:theme="@android:style/Theme.Material.Light.NoActionBar"
+        android:theme="@style/Theme.Eting"
         android:usesCleartextTraffic="false">
+        <meta-data android:name="com.google.firebase.messaging.default_notification_channel_id" android:value="eting_reminders" />
         <activity
             android:name=".MainActivity"
             android:exported="true">
@@ -22,6 +23,9 @@
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
+        </service>
+        <service android:name=".PhoneDataLayerService" android:exported="true">
+            <intent-filter><action android:name="com.google.android.gms.wearable.BIND_LISTENER" /></intent-filter>
         </service>
     </application>
 </manifest>
