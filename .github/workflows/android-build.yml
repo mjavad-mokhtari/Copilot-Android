@@ -26,7 +26,22 @@ jobs:
           packages: 'platform-tools platforms;android-36 build-tools;36.0.0'
 
       - name: Build and test debug APK
-        run: ./gradlew --no-daemon testDebugUnitTest assembleDebug
+        run: ./gradlew --no-daemon testDebugUnitTest assembleDebug --stacktrace 2>&1 | tee build.log
+        shell: bash
+
+      - name: Report Gradle failure details
+        if: failure()
+        shell: bash
+        run: |
+          diagnostic="$(grep -E '^(FAILURE:|\* What went wrong:|Execution failed for task|Could not resolve|Could not find|e: |> )' build.log | tail -n 20 || true)"
+          if [[ -z "$diagnostic" ]]; then
+            diagnostic="Gradle failed without a recognized diagnostic; inspect the workflow log."
+          fi
+          printf '## Gradle failure details\n\n```text\n%s\n```\n' "$diagnostic" >> "$GITHUB_STEP_SUMMARY"
+          diagnostic="${diagnostic//$'\n'/ | }"
+          diagnostic="${diagnostic//'%'/'%25'}"
+          diagnostic="${diagnostic//$'\r'/'%0D'}"
+          echo "::error title=Gradle build failure::$diagnostic"
 
       - uses: actions/upload-artifact@v7
         with:
