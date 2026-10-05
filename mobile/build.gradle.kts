@@ -2,7 +2,10 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.compose")
-    id("com.google.gms.google-services")
+}
+
+if (file("google-services.json").isFile) {
+    pluginManager.apply("com.google.gms.google-services")
 }
 
 android {

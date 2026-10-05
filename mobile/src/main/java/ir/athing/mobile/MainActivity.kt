@@ -91,7 +91,7 @@ private fun LoginScreen(api: EtingApi, onLoggedIn: (String) -> Unit, onError: (S
         OutlinedTextField(username, { username = it }, label = { Text("نام کاربری") }, singleLine = true, modifier = Modifier.fillMaxWidth())
         OutlinedTextField(password, { password = it }, label = { Text("رمز عبور") }, visualTransformation = PasswordVisualTransformation(), singleLine = true, modifier = Modifier.fillMaxWidth().padding(top = 12.dp))
         if (error.isNotBlank()) Text(error, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(top = 8.dp))
-        Button(onClick = { busy = true; onError(""); scope.launch { runCatching { api.login(username.trim(), password) }.onSuccess { onLoggedIn(it); FirebaseMessaging.getInstance().token.addOnSuccessListener { token -> scope.launch { runCatching { api.registerPushToken(token, "phone") } } } }.onFailure { onError(it.message ?: "ورود ناموفق بود") }; busy = false } }, enabled = !busy && username.isNotBlank() && password.isNotBlank(), modifier = Modifier.fillMaxWidth().padding(top = 20.dp)) {
+        Button(onClick = { busy = true; onError(""); scope.launch { runCatching { api.login(username.trim(), password) }.onSuccess { onLoggedIn(it); runCatching { FirebaseMessaging.getInstance().token }.onSuccess { tokenTask -> tokenTask.addOnSuccessListener { token -> scope.launch { runCatching { api.registerPushToken(token, "phone") } } } } }.onFailure { onError(it.message ?: "ورود ناموفق بود") }; busy = false } }, enabled = !busy && username.isNotBlank() && password.isNotBlank(), modifier = Modifier.fillMaxWidth().padding(top = 20.dp)) {
             if (busy) CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp) else Text("ورود")
         }
     }
@@ -114,8 +114,12 @@ private fun MainShell(api: EtingApi, username: String, onLogout: () -> Unit, onS
         pushStatus = if (granted) "اجازهٔ اعلان فعال است؛ وضعیت ثبت دستگاه در حال بررسی است." else "اجازهٔ اعلان داده نشد؛ اعلان‌ها روی این گوشی نمایش داده نمی‌شوند."
     }
     fun syncPushDevice() {
+        val tokenTask = runCatching { FirebaseMessaging.getInstance().token }.getOrElse {
+            pushStatus = "اعلان فشاری پیکربندی نشده است؛ فایل Firebase مخصوص این برنامه لازم است."
+            return
+        }
         pushStatus = "در حال دریافت و ثبت توکن اعلان…"
-        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+        tokenTask.addOnCompleteListener { task ->
             if (!task.isSuccessful) {
                 pushStatus = "دریافت توکن Firebase ناموفق بود؛ اتصال Google Play Services را بررسی کن."
             } else {
